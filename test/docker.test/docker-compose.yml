@@ -1,0 +1,44 @@
+version: '3.5'
+
+services:
+  mysql-data-db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+      - MYSQL_USER=testuser
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - MYSQL_DATABASE=testdb
+    ports:
+      - "43306:3306" 
+    volumes:
+      - $SQL_SERVER_DB_PATH:/var/lib/mysql
+    networks:
+      default:
+        ipv4_address: 172.30.0.2
+        
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    depends_on:
+      - mysql-data-db     
+    environment:
+      - PMA_HOSTS=mysql-data-db
+      - PMA_VERBOSES=testdb
+      - PMA_USER=root
+      - PMA_PASSWORD=$MYSQL_ROOT_PASSWORD
+    ports:
+      - "40080:80"
+    networks:
+      default:
+        ipv4_address: 172.30.0.3
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.0.0/16
+    
+
